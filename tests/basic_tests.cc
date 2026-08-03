@@ -64,7 +64,7 @@ void testDefaultMapTerrain() {
     assert(map.getCell(Position{3, 5}).getType() == CellType::Floor);
     assert(map.getCell(Position{3, 5}).getChamberId() == 1);
     assert(map.getCell(Position{4, 30}).getType() == CellType::Corridor);
-    assert(map.getCell(Position{4, 29}).getType() == CellType::Archway);
+    assert(map.getCell(Position{4, 14}).getType() == CellType::Archway);
     assert(map.getCell(Position{0, 0}).getType() == CellType::Empty);
 }
 
@@ -180,6 +180,25 @@ void testTextDisplayCommandHelpIncludesImplementedActions() {
     assert(rendered.find("u dir use") != std::string::npos);
     assert(rendered.find("a dir attack") != std::string::npos);
     assert(rendered.find("r restart") != std::string::npos);
+}
+
+void testTextDisplayUsesAnsiColours() {
+    VaultLevel level{1};
+    TextDisplay display;
+    std::ostringstream out;
+    std::optional<Position> arcanist = Position{3, 5};
+    std::vector<std::pair<Position, char>> items{
+        {Position{3, 6}, '?'},
+        {Position{3, 7}, '*'}
+    };
+
+    display.draw(out, level, "status line", "message", arcanist, items);
+
+    std::string rendered = out.str();
+    assert(rendered.find("\033[") != std::string::npos);
+    assert(rendered.find("@\033[0m") != std::string::npos);
+    assert(rendered.find("?\033[0m") != std::string::npos);
+    assert(rendered.find("*\033[0m") != std::string::npos);
 }
 
 bool findAdjacentFreeSpawnFloor(
@@ -1080,32 +1099,24 @@ void testDefeatingLichDropsCache() {
     Game game{28};
     SpectreFactory factory;
     ItemFactory itemFactory;
-    game.handleCommand("s");
+    game.handleCommand("h");
+
+    Direction scrollDirection = Direction::North;
+    Position scrollPosition;
+    assert(findAdjacentFreeSpawnFloor(game, scrollDirection, scrollPosition));
+    game.addItem(itemFactory.createScroll(ScrollType::SurgePower, scrollPosition));
+    assert(game.useScroll(scrollDirection));
+    assert(game.getStateName() == "Playing");
 
     Direction direction = Direction::North;
     Position spectrePosition;
     assert(findAdjacentFreeSpawnFloor(game, direction, spectrePosition));
 
     int beforeSpectres = game.getSpectreCount();
-    game.addSpectre(factory.create(SpectreType::Lich, spectrePosition, 1));
-
-    for (int rowOffset = -1; rowOffset <= 1; ++rowOffset) {
-        for (int colOffset = -1; colOffset <= 1; ++colOffset) {
-            Position blocker{spectrePosition.row + rowOffset, spectrePosition.col + colOffset};
-            if (blocker == spectrePosition || blocker == game.getArcanistPosition()) {
-                continue;
-            }
-            if (game.getCurrentLevel().getMap().inBounds(blocker) &&
-                game.getCurrentLevel().getMap().getCell(blocker).isSpawnFloor() &&
-                !game.getCurrentLevel().getItemAt(blocker) &&
-                !game.getCurrentLevel().getSpectreAt(blocker)) {
-                game.addItem(itemFactory.createFragment(FragmentType::CommonShard, blocker));
-            }
-        }
-    }
+    int chamberId = game.getCurrentLevel().getMap().getCell(spectrePosition).getChamberId();
+    game.addSpectre(factory.create(SpectreType::Lich, spectrePosition, chamberId));
     int beforeItems = game.getItemCount();
 
-    assert(game.attackSpectre(direction));
     assert(game.attackSpectre(direction));
 
     assert(!game.getCurrentLevel().getSpectreAt(spectrePosition));
@@ -1286,7 +1297,7 @@ void testInvalidItemPlacementTerrain() {
     std::vector<Position> invalidPositions{
         Position{-1, 0},
         Position{4, 30},
-        Position{4, 29}
+        Position{4, 14}
     };
 
     for (const Position &pos: invalidPositions) {
@@ -1359,13 +1370,13 @@ void testWhitespaceCommandParsing() {
     Position itemPosition;
     assert(findAdjacentFreeSpawnFloor(game, direction, itemPosition));
 
-    game.addItem(factory.createScroll(ScrollType::DrainFocus, itemPosition));
+    game.addItem(factory.createScroll(ScrollType::SurgePower, itemPosition));
     game.handleCommand("u    no");
-    assert(game.getArcanistFP() == 110);
+    assert(game.getArcanistPower() == 23);
 
-    int fpBefore = game.getArcanistFP();
+    int powerBefore = game.getArcanistPower();
     game.handleCommand("   ");
-    assert(game.getArcanistFP() == fpBefore);
+    assert(game.getArcanistPower() == powerBefore);
 }
 
 void testScrollStatLimits() {
@@ -1647,6 +1658,7 @@ int main() {
     testSpawnTiles();
     testTextDisplayRows();
     testTextDisplayCommandHelpIncludesImplementedActions();
+    testTextDisplayUsesAnsiColours();
     testInitialGameState();
     testClassSelectionCommands();
     testEndStatesBlockGameplayAndAllowRestartQuit();

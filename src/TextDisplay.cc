@@ -1,6 +1,65 @@
 #include "TextDisplay.h"
 
 #include <iostream>
+#include <string>
+
+namespace {
+const std::string Reset = "\033[0m";
+const std::string WallColour = "\033[37m";
+const std::string FloorColour = "\033[90m";
+const std::string CorridorColour = "\033[33m";
+const std::string ArcanistColour = "\033[1;36m";
+const std::string ScrollColour = "\033[35m";
+const std::string FragmentColour = "\033[32m";
+const std::string MajorItemColour = "\033[1;33m";
+const std::string SpectreColour = "\033[31m";
+const std::string StairwayColour = "\033[1;34m";
+
+// Returns the ANSI colour that should be used for a board symbol.
+std::string colourForSymbol(char symbol) {
+    if (symbol == '@') {
+        return ArcanistColour;
+    }
+    if (symbol == '?') {
+        return ScrollColour;
+    }
+    if (symbol == '*') {
+        return FragmentColour;
+    }
+    if (symbol == 'C' || symbol == 'G') {
+        return MajorItemColour;
+    }
+    if (symbol == '\\') {
+        return StairwayColour;
+    }
+    if (symbol == '+' || symbol == '#') {
+        return CorridorColour;
+    }
+    if (symbol == '|' || symbol == '-') {
+        return WallColour;
+    }
+    if (symbol == '.') {
+        return FloorColour;
+    }
+    if (symbol == 'W' || symbol == 'B' || symbol == 'R' ||
+        symbol == 'S' || symbol == 'L' || symbol == 'A' ||
+        symbol == 'X') {
+        return SpectreColour;
+    }
+
+    return "";
+}
+
+// Prints one symbol with ANSI colour, keeping spaces uncoloured for readability.
+void printColouredSymbol(std::ostream &out, char symbol) {
+    std::string colour = colourForSymbol(symbol);
+    if (colour.empty()) {
+        out << symbol;
+    } else {
+        out << colour << symbol << Reset;
+    }
+}
+}
 
 // Draws terrain, item objects, the Arcanist overlay, and the 5 status rows.
 void TextDisplay::draw(
@@ -38,7 +97,10 @@ void TextDisplay::draw(
     }
 
     for (const std::string &row: rows) {
-        out << row << '\n';
+        for (char symbol: row) {
+            printColouredSymbol(out, symbol);
+        }
+        out << '\n';
     }
 
     // The spec reserves the bottom 5 rows for status information.

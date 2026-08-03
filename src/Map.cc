@@ -13,45 +13,45 @@ Map Map::createDefault() {
 
     // The default vault follows the five-room graph from the project spec:
     // 1 connects to 2 and 3, 2 connects to 4, 3 connects to 4, and 4 connects to 5.
-    map.placeRoom(2, 4, 5, 26, 1);
-    map.placeRoom(2, 39, 5, 24, 2);
-    map.placeRoom(13, 4, 5, 26, 3);
-    map.placeRoom(13, 39, 5, 24, 4);
-    map.placeRoom(20, 39, 5, 24, 5);
+    map.placeRoom(2, 4, 5, 11, 1);
+    map.placeRoom(2, 39, 5, 11, 2);
+    map.placeRoom(13, 4, 5, 11, 3);
+    map.placeRoom(13, 39, 5, 11, 4);
+    map.placeRoom(20, 39, 5, 11, 5);
 
     // Chamber 1 <-> Chamber 2.
-    map.setCell(Position{4, 29}, CellType::Archway);
+    map.setCell(Position{4, 14}, CellType::Archway);
     map.setCell(Position{4, 39}, CellType::Archway);
-    for (int col = 30; col <= 38; ++col) {
+    for (int col = 15; col <= 38; ++col) {
         map.setCell(Position{4, col}, CellType::Corridor);
     }
 
     // Chamber 1 <-> Chamber 3.
-    map.setCell(Position{6, 15}, CellType::Archway);
-    map.setCell(Position{13, 15}, CellType::Archway);
+    map.setCell(Position{6, 9}, CellType::Archway);
+    map.setCell(Position{13, 9}, CellType::Archway);
     for (int row = 7; row <= 12; ++row) {
-        map.setCell(Position{row, 15}, CellType::Corridor);
+        map.setCell(Position{row, 9}, CellType::Corridor);
     }
 
     // Chamber 2 <-> Chamber 4.
-    map.setCell(Position{6, 50}, CellType::Archway);
-    map.setCell(Position{13, 50}, CellType::Archway);
+    map.setCell(Position{6, 44}, CellType::Archway);
+    map.setCell(Position{13, 44}, CellType::Archway);
     for (int row = 7; row <= 12; ++row) {
-        map.setCell(Position{row, 50}, CellType::Corridor);
+        map.setCell(Position{row, 44}, CellType::Corridor);
     }
 
     // Chamber 3 <-> Chamber 4.
-    map.setCell(Position{15, 29}, CellType::Archway);
+    map.setCell(Position{15, 14}, CellType::Archway);
     map.setCell(Position{15, 39}, CellType::Archway);
-    for (int col = 30; col <= 38; ++col) {
+    for (int col = 15; col <= 38; ++col) {
         map.setCell(Position{15, col}, CellType::Corridor);
     }
 
     // Chamber 4 <-> Chamber 5.
-    map.setCell(Position{17, 50}, CellType::Archway);
-    map.setCell(Position{20, 50}, CellType::Archway);
+    map.setCell(Position{17, 44}, CellType::Archway);
+    map.setCell(Position{20, 44}, CellType::Archway);
     for (int row = 18; row <= 19; ++row) {
-        map.setCell(Position{row, 50}, CellType::Corridor);
+        map.setCell(Position{row, 44}, CellType::Corridor);
     }
 
     return map;
