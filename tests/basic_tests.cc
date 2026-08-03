@@ -63,8 +63,12 @@ void testDefaultMapTerrain() {
 
     assert(map.getCell(Position{3, 5}).getType() == CellType::Floor);
     assert(map.getCell(Position{3, 5}).getChamberId() == 1);
-    assert(map.getCell(Position{4, 30}).getType() == CellType::Corridor);
+    assert(map.getCell(Position{4, 15}).getType() == CellType::Corridor);
     assert(map.getCell(Position{4, 14}).getType() == CellType::Archway);
+    assert(map.getCell(Position{4, 22}).getType() == CellType::Corridor);
+    assert(map.getCell(Position{4, 23}).getType() == CellType::Archway);
+    assert(map.getCell(Position{7, 9}).getType() == CellType::Corridor);
+    assert(map.getCell(Position{8, 9}).getType() == CellType::Corridor);
     assert(map.getCell(Position{0, 0}).getType() == CellType::Empty);
 }
 
@@ -454,7 +458,7 @@ void testLayoutDigitItemsLoadCorrectTypes() {
 
     Random rng{7};
     VaultLevel level{1, Map::createFromLayoutRows(rows)};
-    level.loadItemsFromLayoutRows(rng, rows, Position{3, 20});
+    level.loadItemsFromLayoutRows(rng, rows, Position{3, 24});
 
     assert(level.getItemCount() == 10);
     assert(level.getItemAt(Position{3, 5})->getScrollType() == ScrollType::AttuneFocus);
@@ -1296,7 +1300,7 @@ void testInvalidItemPlacementTerrain() {
 
     std::vector<Position> invalidPositions{
         Position{-1, 0},
-        Position{4, 30},
+        Position{4, 15},
         Position{4, 14}
     };
 
