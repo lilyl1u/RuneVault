@@ -212,5 +212,5 @@ SpecterLord::SpecterLord(const Position &position, int spawnChamberId):
         15,
         position,
         spawnChamberId,
-        std::make_unique<RandomMovement>(),
+        std::make_unique<ChaseMovement>(),
         std::make_unique<AlwaysHostile>()} {}

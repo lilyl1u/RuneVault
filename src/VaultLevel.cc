@@ -22,6 +22,26 @@ class VaultMovementContext: public MovementContext {
         const Position &position) const override {
         return level.canSpectreMoveTo(spectre, position, arcanistPosition);
     }
+
+    // BONUS FEATURE: Spectre intelligence
+    // Provides the BFS target without exposing VaultLevel internals to strategies.
+    Position getArcanistPosition() const override {
+        return arcanistPosition;
+    }
+
+    // BONUS FEATURE: Spectre intelligence
+    // Lets pathfinding code perform bounds checks through the MovementContext abstraction.
+    bool inBounds(const Position &position) const override {
+        return level.getMap().inBounds(position);
+    }
+
+    // BONUS FEATURE: Spectre intelligence
+    // Adapts VaultLevel traversal rules for intelligent cross-chamber pursuit.
+    bool canSpectrePathThrough(
+        const AbstractSpectre &spectre,
+        const Position &position) const override {
+        return level.canSpectrePathThrough(spectre, position);
+    }
 };
 
 class VaultHostilityContext: public HostilityContext {
@@ -450,6 +470,31 @@ bool VaultLevel::canSpectreMoveTo(
         return false;
     }
     if (cell.getChamberId() != spectre.getSpawnChamberId()) {
+        return false;
+    }
+    if (hasItemAt(position)) {
+        return false;
+    }
+    if (hasSpectreAt(position)) {
+        return false;
+    }
+
+    return true;
+}
+
+// BONUS FEATURE: Spectre intelligence
+// Path traversal allows corridors/archways, while normal random movement stays chamber-local.
+bool VaultLevel::canSpectrePathThrough(
+    const AbstractSpectre &spectre,
+    const Position &position) const {
+    (void) spectre;
+
+    if (!map.inBounds(position)) {
+        return false;
+    }
+
+    const Cell &cell = map.getCell(position);
+    if (!cell.isWalkable()) {
         return false;
     }
     if (hasItemAt(position)) {

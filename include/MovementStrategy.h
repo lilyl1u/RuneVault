@@ -17,6 +17,18 @@ class MovementContext {
 
     // Returns whether a spectre may move to this destination.
     virtual bool canSpectreMoveTo(const AbstractSpectre &spectre, const Position &position) const = 0;
+
+    // BONUS FEATURE: Spectre intelligence
+    // Exposes the player location so pathfinding strategies can pursue across the map.
+    virtual Position getArcanistPosition() const = 0;
+
+    // BONUS FEATURE: Spectre intelligence
+    // Allows pathfinding strategies to reject out-of-bounds positions without knowing the map.
+    virtual bool inBounds(const Position &position) const = 0;
+
+    // BONUS FEATURE: Spectre intelligence
+    // Returns whether intelligent spectres may plan through this walkable map tile.
+    virtual bool canSpectrePathThrough(const AbstractSpectre &spectre, const Position &position) const = 0;
 };
 
 // ==================== DESIGN PATTERN: Strategy ====================
@@ -56,6 +68,19 @@ class StationaryMovement: public MovementStrategy {
     std::string getName() const override;
 
     // Always returns nullopt.
+    std::optional<Position> chooseMove(
+        const AbstractSpectre &spectre,
+        const MovementContext &context,
+        Random &rng) const override;
+};
+
+// BONUS FEATURE: Spectre intelligence - BFS pursuit across rooms and corridors.
+class ChaseMovement: public MovementStrategy {
+  public:
+    // Returns the strategy name.
+    std::string getName() const override;
+
+    // Uses BFS to choose the first step on the shortest path toward the Arcanist.
     std::optional<Position> chooseMove(
         const AbstractSpectre &spectre,
         const MovementContext &context,

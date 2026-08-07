@@ -115,6 +115,10 @@ class VaultLevel {
     // Returns whether a spectre could legally move to a position.
     bool canSpectreMoveTo(const AbstractSpectre &spectre, const Position &position, const Position &arcanistPosition) const;
 
+    // BONUS FEATURE: Spectre intelligence
+    // Returns whether pathfinding spectres may plan through this walkable tile.
+    bool canSpectrePathThrough(const AbstractSpectre &spectre, const Position &position) const;
+
     // Returns true when a guarded item is still protected by its anchor.
     bool isGuardedItemLocked(const Position &position) const;
 

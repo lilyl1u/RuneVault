@@ -26,6 +26,8 @@ std::unique_ptr<AbstractSpectre> SpectreFactory::create(
         return std::make_unique<VaultAnchor>(position, spawnChamberId);
     }
     if (type == SpectreType::SpecterLord) {
+        // BONUS FEATURE: Spectre intelligence
+        // Specter Lords are the intelligent hunters that use BFS chase movement.
         return std::make_unique<SpecterLord>(position, spawnChamberId);
     }
 
