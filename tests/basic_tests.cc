@@ -494,6 +494,25 @@ void testLayoutGameModeUsesSeedAndSkipsRandomItems() {
     assert(first.getCurrentLevel().getCipherCarrierPosition());
 }
 
+void testFiveLevelLayoutRowsAreAccepted() {
+    std::vector<std::string> baseRows = Map::createDefault().toRows();
+    std::vector<std::string> allRows;
+
+    // A 125-row layout represents five 25-row levels in one file.
+    for (int level = 0; level < 5; ++level) {
+        std::vector<std::string> levelRows = baseRows;
+        levelRows[3][5 + level] = '6';
+        allRows.insert(allRows.end(), levelRows.begin(), levelRows.end());
+    }
+
+    Game game{allRows, 40};
+    game.handleCommand("s");
+
+    assert(game.getLevelNumber() == 1);
+    assert(game.getItemCount() == 1);
+    assert(game.getSpectreCount() == 20);
+}
+
 void testGeneratedCipherCarrierExistsAndIsNotAnchor() {
     Game game{321};
     game.handleCommand("s");
@@ -1728,6 +1747,7 @@ int main() {
     testGeneratedItemsAreLegalAndNonOverlapping();
     testLayoutDigitItemsLoadCorrectTypes();
     testLayoutGameModeUsesSeedAndSkipsRandomItems();
+    testFiveLevelLayoutRowsAreAccepted();
     testGeneratedCipherCarrierExistsAndIsNotAnchor();
     testGuardedItemLockAndUnlock();
     testSpectreFactoryCreatesAllTypes();

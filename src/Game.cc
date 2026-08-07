@@ -9,6 +9,34 @@
 #include <string>
 #include <vector>
 
+namespace {
+
+// Layout files may either describe one reusable level or all five levels.
+std::vector<std::string> layoutRowsForLevel(
+    const std::vector<std::string> &rows,
+    int levelNumber) {
+    if (rows.size() == static_cast<std::size_t>(Map::Height)) {
+        return rows;
+    }
+    if (rows.size() != static_cast<std::size_t>(Map::Height * 5)) {
+        throw std::invalid_argument{
+            "Layout file must contain either 25 rows or 125 rows"};
+    }
+    if (levelNumber < 1 || levelNumber > 5) {
+        throw std::invalid_argument{"Layout level number must be between 1 and 5"};
+    }
+
+    std::vector<std::string> levelRows;
+    int startRow = (levelNumber - 1) * Map::Height;
+    for (int row = 0; row < Map::Height; ++row) {
+        levelRows.emplace_back(rows[startRow + row]);
+    }
+
+    return levelRows;
+}
+
+} // namespace
+
 // Constructs a new game using a time-seeded RNG.
 Game::Game():
     currentLevel{1},
@@ -41,7 +69,7 @@ Game::Game(unsigned int seed):
 
 // Constructs a layout-file game using a time-seeded RNG.
 Game::Game(const std::vector<std::string> &layoutRows):
-    currentLevel{1, Map::createFromLayoutRows(layoutRows)},
+    currentLevel{1, Map::createFromLayoutRows(layoutRowsForLevel(layoutRows, 1))},
     display{},
     rng{},
     arcanistFactory{},
@@ -56,7 +84,7 @@ Game::Game(const std::vector<std::string> &layoutRows):
 
 // Constructs a layout-file game using a deterministic RNG.
 Game::Game(const std::vector<std::string> &layoutRows, unsigned int seed):
-    currentLevel{1, Map::createFromLayoutRows(layoutRows)},
+    currentLevel{1, Map::createFromLayoutRows(layoutRowsForLevel(layoutRows, 1))},
     display{},
     rng{seed},
     arcanistFactory{},
@@ -253,7 +281,7 @@ void Game::addSpectre(std::unique_ptr<AbstractSpectre> spectre) {
 // Resets all current run data back to a fresh class-selection state.
 void Game::restart() {
     if (layoutRows) {
-        currentLevel = VaultLevel{1, Map::createFromLayoutRows(layoutRows.value())};
+        currentLevel = VaultLevel{1, Map::createFromLayoutRows(layoutRowsForLevel(layoutRows.value(), 1))};
     } else {
         currentLevel = VaultLevel{1};
     }
@@ -402,6 +430,15 @@ void Game::setMessage(const std::string &newMessage) {
     message = newMessage;
 }
 
+// Selects the current 25-row layout chunk from a 25-row or 125-row layout file.
+std::vector<std::string> Game::currentLayoutRows() const {
+    if (!layoutRows) {
+        throw std::logic_error{"No layout file is active"};
+    }
+
+    return layoutRowsForLevel(layoutRows.value(), currentLevel.getLevelNumber());
+}
+
 // Builds the one-line status text printed in the reserved status rows.
 std::string Game::makeStatusLine() const {
     if (!arcanist) {
@@ -422,12 +459,16 @@ std::string Game::makeStatusLine() const {
 // Chooses a random floor tile from any chamber for the Arcanist spawn.
 Position Game::randomSpawnPosition() {
     std::vector<Position> allTiles;
+    std::vector<std::string> activeRows;
+    if (layoutRows) {
+        activeRows = currentLayoutRows();
+    }
 
     for (int chamberId = 1; chamberId <= 5; ++chamberId) {
         std::vector<Position> chamberTiles = currentLevel.getMap().getSpawnTiles(chamberId);
         for (const Position &pos: chamberTiles) {
             if (layoutRows &&
-                std::isdigit(static_cast<unsigned char>(layoutRows.value()[pos.row][pos.col]))) {
+                std::isdigit(static_cast<unsigned char>(activeRows[pos.row][pos.col]))) {
                 continue;
             }
             allTiles.emplace_back(pos);
@@ -596,7 +637,7 @@ void Game::startCurrentLevel() {
     // VaultLevel delegates concrete item/spectre creation to factories while
     // Game only coordinates when a level starts.
     if (layoutRows) {
-        currentLevel.loadItemsFromLayoutRows(rng, layoutRows.value(), arcanist->getPosition());
+        currentLevel.loadItemsFromLayoutRows(rng, currentLayoutRows(), arcanist->getPosition());
     } else {
         currentLevel.generateBasicItems(
             rng,
@@ -636,7 +677,9 @@ void Game::advanceToNextLevel() {
     arcanist->resetCipherGem();
 
     if (layoutRows) {
-        currentLevel = VaultLevel{nextLevelNumber, Map::createFromLayoutRows(layoutRows.value())};
+        currentLevel = VaultLevel{
+            nextLevelNumber,
+            Map::createFromLayoutRows(layoutRowsForLevel(layoutRows.value(), nextLevelNumber))};
     } else {
         currentLevel = VaultLevel{nextLevelNumber};
     }

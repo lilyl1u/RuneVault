@@ -41,6 +41,9 @@ class Game {
     // Builds the current one-line status summary for TextDisplay.
     std::string makeStatusLine() const;
 
+    // Returns the 25 layout rows that belong to the current vault level.
+    std::vector<std::string> currentLayoutRows() const;
+
     // Chooses a legal chamber floor tile for the Arcanist.
     Position randomSpawnPosition();
 
