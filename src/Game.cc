@@ -235,8 +235,12 @@ bool Game::attackSpectre(Direction direction) {
     spectre->takeDamage(damage);
 
     if (spectre->isDefeated()) {
-        handleSpectreDefeat(targetPosition, *spectre);
-        setMessage("Defeated " + spectreName + ".");
+        bool collectedCipherGem = handleSpectreDefeat(targetPosition, *spectre);
+        if (collectedCipherGem) {
+            setMessage("Defeated " + spectreName + " and recovered the Cipher Gem. The stairway is revealed.");
+        } else {
+            setMessage("Defeated " + spectreName + ".");
+        }
     } else {
         setMessage("Hit " + spectreName + " for " + std::to_string(damage) + " damage.");
     }
@@ -528,9 +532,9 @@ void Game::collectMajorItem(Item &item) {
 }
 
 // Applies the correct reward/drop for a defeated spectre and removes it from the level.
-void Game::handleSpectreDefeat(const Position &position, const AbstractSpectre &spectre) {
+bool Game::handleSpectreDefeat(const Position &position, const AbstractSpectre &spectre) {
     if (!arcanist) {
-        return;
+        return false;
     }
 
     SpectreType type = spectre.getType();
@@ -538,14 +542,20 @@ void Game::handleSpectreDefeat(const Position &position, const AbstractSpectre &
     currentLevel.removeSpectreAt(position);
 
     if (hadCipherGem) {
-        ItemFactory factory;
-        currentLevel.addItem(factory.createMajorItem(MajorItemType::CipherGem, position));
+        // CIPHER GEM AUTO-PICKUP:
+        // Defeating the carrier gives the gem directly to the Arcanist instead
+        // of dropping a C item that the player must step away from and re-enter.
+        arcanist->collectCipherGem();
+        currentLevel.revealStairway();
+        return true;
     } else if (type == SpectreType::Lich) {
         ItemFactory factory;
         currentLevel.addItem(factory.createFragment(FragmentType::LichCache, position));
     } else if (type != SpectreType::VaultAnchor) {
         arcanist->addRuneFragments(1);
     }
+
+    return false;
 }
 
 // Resolves spectre turns and applies attacks returned by hostile spectres.

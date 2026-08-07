@@ -1207,7 +1207,7 @@ void testDefeatingLichDropsCache() {
     assert(game.getRuneFragments() == 0);
 }
 
-void testCipherGemDropPickupAndReveal() {
+void testCipherGemAutoPickupAndReveal() {
     Game game{30};
     SpectreFactory factory;
     game.handleCommand("s");
@@ -1229,16 +1229,9 @@ void testCipherGemDropPickupAndReveal() {
 
     assert(!game.getCurrentLevel().getSpectreAt(spectrePosition));
     const Item *drop = game.getCurrentLevel().getItemAt(spectrePosition);
-    assert(drop);
-    assert(drop->getCategory() == ItemCategory::MajorItem);
-    assert(drop->getMajorItemType() == MajorItemType::CipherGem);
-    assert(!game.hasCipherGem());
-    assert(!game.getCurrentLevel().isStairwayVisible());
-
-    assert(game.moveArcanist(direction));
+    assert(!drop);
     assert(game.hasCipherGem());
     assert(game.getCurrentLevel().isStairwayVisible());
-    assert(!game.getCurrentLevel().getItemAt(spectrePosition));
 }
 
 void testMovementBlockedByManualSpectre() {
@@ -1781,7 +1774,7 @@ int main() {
     testAttackDamagesSpectreWithoutDefeatingIt();
     testDefeatingRegularSpectreAwardsFragment();
     testDefeatingLichDropsCache();
-    testCipherGemDropPickupAndReveal();
+    testCipherGemAutoPickupAndReveal();
     testMovementBlockedByManualSpectre();
     testUseScrollBeforeClassSelectionFails();
     testMovingOntoScrollDoesNotUseIt();

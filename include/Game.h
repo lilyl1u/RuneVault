@@ -53,8 +53,8 @@ class Game {
     // Collects a major item if the Arcanist is standing on one.
     void collectMajorItem(Item &item);
 
-    // Handles rewards/drops after a spectre reaches 0 FP.
-    void handleSpectreDefeat(const Position &position, const AbstractSpectre &spectre);
+    // Handles rewards/drops after a spectre reaches 0 FP; true means Cipher Gem was collected.
+    bool handleSpectreDefeat(const Position &position, const AbstractSpectre &spectre);
 
     // Runs spectre movement/attack turns after a valid Arcanist action.
     void processSpectreTurns();
