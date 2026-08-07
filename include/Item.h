@@ -5,6 +5,8 @@
 
 #include "Position.h"
 
+//These enums are just used to describe the subtypes inside each class 
+// Enums are reasonable because not every scroll needs its own class
 enum class ItemCategory {
     Scroll,
     RuneFragment,
