@@ -655,6 +655,16 @@ void Game::startCurrentLevel() {
             currentLevel.getLevelNumber() == aegisCloakLevel);
     }
     currentLevel.generateSpectres(rng, arcanist->getPosition());
+
+    // EXTENSION: Ritualist
+    // Ritualists begin every level with one random scroll effect already active.
+    // The class-specific choice is exposed through ArcanistAbility, so this
+    // level-start hook works without checking whether the concrete class is Ritualist.
+    if (arcanist->startsLevelWithRandomScrollEffect()) {
+        ScrollType randomScrollType = static_cast<ScrollType>(rng.range(0, 5));
+        applyScroll(randomScrollType);
+        updateLossIfArcanistDefeated();
+    }
 }
 
 // Descends when the Arcanist is standing on a revealed stairway.
@@ -695,6 +705,9 @@ void Game::advanceToNextLevel() {
     }
     arcanist->setPosition(randomSpawnPosition());
     startCurrentLevel();
+    if (arcanist->getCurrentFP() == 0) {
+        return;
+    }
     setMessage("Descended to vault level " + std::to_string(nextLevelNumber) + ".");
 }
 

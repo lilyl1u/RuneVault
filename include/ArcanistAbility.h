@@ -27,6 +27,12 @@ class ArcanistAbility {
 
     // Allows a class to reduce incoming damage before item effects.
     virtual int modifyIncomingDamage(int damage) const;
+
+    // EXTENSION: Ritualist
+    // Most Arcanists do not receive a free scroll effect when a level begins.
+    // RitualistAbility overrides this hook so Game can apply the extension
+    // through the existing Strategy interface instead of checking concrete classes.
+    virtual bool startsLevelWithRandomScrollEffect() const;
 };
 
 // Concrete Strategy: Sage gets +50% final score.
@@ -67,6 +73,18 @@ class VoidwalkerAbility: public ArcanistAbility {
 
     // Converts negative scrolls to their positive counterpart 50% of the time.
     ScrollType transformScroll(ScrollType type, Random &rng) const override;
+};
+
+// EXTENSION: Ritualist
+// Concrete Strategy for the new fifth class. Its distinguishing rule is that
+// each vault level starts with one random scroll effect already active.
+class RitualistAbility: public ArcanistAbility {
+  public:
+    // Returns the strategy name.
+    std::string getName() const override;
+
+    // Enables the Ritualist's level-start random scroll extension.
+    bool startsLevelWithRandomScrollEffect() const override;
 };
 
 #endif

@@ -23,6 +23,13 @@ int ArcanistAbility::modifyIncomingDamage(int damage) const {
     return damage;
 }
 
+// EXTENSION: Ritualist
+// Default classes opt out of the level-start random scroll effect. Keeping the
+// default here means Game can ask every ArcanistAbility the same question.
+bool ArcanistAbility::startsLevelWithRandomScrollEffect() const {
+    return false;
+}
+
 // Returns the Sage strategy name.
 std::string SageAbility::getName() const {
     return "Sage Ability";
@@ -75,4 +82,16 @@ ScrollType VoidwalkerAbility::transformScroll(ScrollType type, Random &rng) cons
     }
 
     return type;
+}
+
+// EXTENSION: Ritualist
+// Returns the strategy name for the new fifth class's ability.
+std::string RitualistAbility::getName() const {
+    return "Ritualist Ability";
+}
+
+// EXTENSION: Ritualist
+// This is the Strategy hook that turns on the free random scroll at level start.
+bool RitualistAbility::startsLevelWithRandomScrollEffect() const {
+    return true;
 }

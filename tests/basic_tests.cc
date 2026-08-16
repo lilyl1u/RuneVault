@@ -299,6 +299,16 @@ void testClassSelectionCommands() {
     assert(game.getArcanistFP() == 110);
     assert(game.getArcanistPower() == 22);
     assert(game.getArcanistWard() == 12);
+
+    game.handleCommand("r");
+    assert(game.getStateName() == "Class Selection");
+
+    // EXTENSION: Ritualist
+    // Verifies the new fifth class can be selected with 't'. Exact starting
+    // stats may already include its random level-start scroll effect.
+    game.handleCommand("t");
+    assert(game.getStateName() == "Playing");
+    assert(game.getSelectedClassName() == "Ritualist");
 }
 
 void testEndStatesBlockGameplayAndAllowRestartQuit() {
@@ -369,6 +379,15 @@ void testArcanistFactoryStats() {
     assert(voidwalker->getCurrentFP() == 110);
     assert(voidwalker->getPower() == 22);
     assert(voidwalker->getWard() == 12);
+
+    // EXTENSION: Ritualist
+    // Verifies the factory creates the new fifth class through the abstract type.
+    std::unique_ptr<AbstractArcanist> ritualist = factory.create('t', pos);
+    assert(ritualist->getClassName() == "Ritualist");
+    assert(ritualist->getCurrentFP() == 115);
+    assert(ritualist->getMaxFP() == 115);
+    assert(ritualist->getPower() == 20);
+    assert(ritualist->getWard() == 16);
 }
 
 void testArcanistAbilityStrategiesDirectly() {
@@ -389,6 +408,13 @@ void testArcanistAbilityStrategiesDirectly() {
     std::unique_ptr<AbstractArcanist> voidwalker = factory.create('v', pos);
     bool sawConversion = false;
     bool sawNoConversion = false;
+
+    // EXTENSION: Ritualist
+    // Verifies the new class opts in to the level-start scroll Strategy hook,
+    // while an existing class keeps the default false behavior.
+    std::unique_ptr<AbstractArcanist> ritualist = factory.create('t', pos);
+    assert(!sage->startsLevelWithRandomScrollEffect());
+    assert(ritualist->startsLevelWithRandomScrollEffect());
 
     for (unsigned int seed = 0; seed < 100; ++seed) {
         Random rng{seed};
@@ -1067,6 +1093,28 @@ void testHexbladeDoublesScrollEffectsInGame() {
     game.addItem(factory.createScroll(ScrollType::SurgePower, itemPosition));
     assert(game.useScroll(direction));
     assert(game.getArcanistPower() == 34);
+}
+
+void testRitualistStartsLevelWithRandomScrollEffectInGame() {
+    // EXTENSION: Ritualist
+    // Across seeded games, at least one Ritualist should show a changed starting
+    // FP/Power/Ward from the free random scroll applied during startCurrentLevel.
+    bool sawAppliedVisibleEffect = false;
+
+    for (unsigned int seed = 0; seed < 50; ++seed) {
+        Game game{seed};
+        game.handleCommand("t");
+        assert(game.getSelectedClassName() == "Ritualist");
+
+        if (game.getArcanistFP() != 115 ||
+            game.getArcanistPower() != 20 ||
+            game.getArcanistWard() != 16) {
+            sawAppliedVisibleEffect = true;
+            break;
+        }
+    }
+
+    assert(sawAppliedVisibleEffect);
 }
 
 void testIncomingDamageStrategyInGame() {
@@ -1766,6 +1814,7 @@ int main() {
     testFragmentPickup();
     testScrollUseAndEdgeCases();
     testHexbladeDoublesScrollEffectsInGame();
+    testRitualistStartsLevelWithRandomScrollEffectInGame();
     testIncomingDamageStrategyInGame();
     testDamageFormula();
     testSageFinalScoreInGame();

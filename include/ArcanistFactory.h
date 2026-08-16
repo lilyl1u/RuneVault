@@ -7,7 +7,7 @@
 
 // ==================== DESIGN PATTERN: Factory Method / Simple Factory ====================
 // The factory centralizes Arcanist creation so Game does not need to know the
-// constructor details for Sage, Hexblade, Warden, and Voidwalker.
+// constructor details for Sage, Hexblade, Warden, Voidwalker, and Ritualist.
 class ArcanistFactory {
   public:
     // Creates the chosen Arcanist and transfers ownership to the caller.

@@ -18,6 +18,12 @@ std::unique_ptr<AbstractArcanist> ArcanistFactory::create(
     if (classCode == 'v') {
         return std::make_unique<Voidwalker>(position);
     }
+    // EXTENSION: Ritualist
+    // 't' selects the fifth Arcanist class. 'r' remains restart, so the command
+    // uses the distinctive letter in RiTualist.
+    if (classCode == 't') {
+        return std::make_unique<Ritualist>(position);
+    }
 
     throw std::invalid_argument{"Unknown Arcanist class code"};
 }

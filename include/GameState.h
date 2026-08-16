@@ -25,7 +25,7 @@ class GameState {
     virtual void handleCommand(Game &game, const std::string &command) = 0;
 };
 
-// Concrete State: the player must choose Sage/Hexblade/Warden/Voidwalker.
+// Concrete State: the player must choose Sage/Hexblade/Warden/Voidwalker/Ritualist.
 class ClassSelectionState: public GameState {
   public:
     // Returns the class selection state name.

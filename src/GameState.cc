@@ -23,19 +23,23 @@ std::string ClassSelectionState::getName() const {
 
 // Shows the class-selection prompt when this state becomes active.
 void ClassSelectionState::onEnter(Game &game) {
-    game.setMessage("Choose class: s=Sage, h=Hexblade, w=Warden, v=Voidwalker. q quits.");
+    // EXTENSION: Ritualist
+    // Adds 't' to the class-selection prompt for the fifth Arcanist class.
+    game.setMessage("Choose class: s=Sage, h=Hexblade, w=Warden, v=Voidwalker, t=Ritualist. q quits.");
 }
 
 // Handles only commands that make sense before an Arcanist exists.
 void ClassSelectionState::handleCommand(Game &game, const std::string &command) {
-    if (command == "s" || command == "h" || command == "w" || command == "v") {
+    // EXTENSION: Ritualist
+    // Accepts 't' as the Ritualist selection command. 'r' stays reserved for restart.
+    if (command == "s" || command == "h" || command == "w" || command == "v" || command == "t") {
         game.selectClass(command[0]);
     } else if (command == "q") {
         game.quit();
     } else if (command == "r") {
         game.restart();
     } else {
-        game.setMessage("Invalid class. Enter s, h, w, v, r, or q.");
+        game.setMessage("Invalid class. Enter s, h, w, v, t, r, or q.");
     }
 }
 

@@ -77,6 +77,11 @@ class AbstractArcanist {
     // Applies class-specific incoming damage changes.
     int modifyIncomingDamage(int damage) const;
 
+    // EXTENSION: Ritualist
+    // Returns whether this Arcanist should receive a random scroll effect when
+    // each level starts. Delegates to the class ability Strategy.
+    bool startsLevelWithRandomScrollEffect() const;
+
     // Moves the Arcanist to an already-validated board position.
     void setPosition(const Position &newPosition);
 
@@ -139,6 +144,15 @@ class Voidwalker: public AbstractArcanist {
   public:
     // Creates a Voidwalker with the spec's starting stats.
     explicit Voidwalker(const Position &position);
+};
+
+// EXTENSION: Ritualist
+// Fifth playable Arcanist class. The level-start random scroll behavior is
+// supplied by RitualistAbility, so the class itself only provides stats/name.
+class Ritualist: public AbstractArcanist {
+  public:
+    // Creates a Ritualist with the extension's starting stats.
+    explicit Ritualist(const Position &position);
 };
 
 #endif

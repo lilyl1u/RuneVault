@@ -100,6 +100,13 @@ int AbstractArcanist::modifyIncomingDamage(int damage) const {
     return ability->modifyIncomingDamage(damage);
 }
 
+// EXTENSION: Ritualist
+// Delegates the level-start random scroll rule to the class ability Strategy.
+// This keeps Ritualist-specific behavior out of Game's class-selection logic.
+bool AbstractArcanist::startsLevelWithRandomScrollEffect() const {
+    return ability->startsLevelWithRandomScrollEffect();
+}
+
 // Updates the Arcanist's position after Game validates the move.
 void AbstractArcanist::setPosition(const Position &newPosition) {
     position = newPosition;
@@ -190,3 +197,9 @@ Warden::Warden(const Position &position):
 // Creates a Voidwalker with the required starting stats.
 Voidwalker::Voidwalker(const Position &position):
     AbstractArcanist{"Voidwalker", 110, 22, 12, position, std::make_unique<VoidwalkerAbility>()} {}
+
+// EXTENSION: Ritualist
+// Creates the fifth playable class. Stats are intentionally balanced between
+// the existing classes; the special rule lives in RitualistAbility.
+Ritualist::Ritualist(const Position &position):
+    AbstractArcanist{"Ritualist", 115, 20, 16, position, std::make_unique<RitualistAbility>()} {}
