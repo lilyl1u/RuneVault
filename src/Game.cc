@@ -302,16 +302,19 @@ bool Game::attackSpectre(Direction direction) {
     int damage = calculateDamage(arcanist->getPower(), spectre->getWard());
     std::string spectreName = spectre->getName();
     spectre->takeDamage(damage);
+    int remainingFP = spectre->getFocusPoints();
 
     if (spectre->isDefeated()) {
         bool collectedCipherGem = handleSpectreDefeat(targetPosition, *spectre);
         if (collectedCipherGem) {
-            setMessage("Defeated " + spectreName + " and recovered the Cipher Gem. The stairway is revealed.");
+            setMessage("Defeated " + spectreName + " (FP: 0) and recovered the Cipher Gem. The stairway is revealed.");
         } else {
-            setMessage("Defeated " + spectreName + ".");
+            setMessage("Defeated " + spectreName + " (FP: 0).");
         }
     } else {
-        setMessage("Hit " + spectreName + " for " + std::to_string(damage) + " damage.");
+        setMessage(
+            "Hit " + spectreName + " for " + std::to_string(damage) +
+            " damage. " + spectreName + " FP: " + std::to_string(remainingFP) + ".");
     }
 
     processSpectreTurns();
