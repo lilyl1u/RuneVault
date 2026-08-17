@@ -197,6 +197,9 @@ class Game {
 
     // Updates the message shown in the status area.
     void setMessage(const std::string &newMessage);
+
+    // Adds another event to the current status message.
+    void appendMessage(const std::string &newMessage);
 };
 
 #endif

@@ -307,9 +307,14 @@ bool Game::attackSpectre(Direction direction) {
     if (spectre->isDefeated()) {
         bool collectedCipherGem = handleSpectreDefeat(targetPosition, *spectre);
         if (collectedCipherGem) {
-            setMessage("Defeated " + spectreName + " (FP: 0) and recovered the Cipher Gem. The stairway is revealed.");
+            setMessage(
+                "Hit " + spectreName + " for " + std::to_string(damage) +
+                " damage. " + spectreName + " FP: 0. Defeated " +
+                spectreName + " and recovered the Cipher Gem. The stairway is revealed.");
         } else {
-            setMessage("Defeated " + spectreName + " (FP: 0).");
+            setMessage(
+                "Hit " + spectreName + " for " + std::to_string(damage) +
+                " damage. " + spectreName + " FP: 0. Defeated " + spectreName + ".");
         }
     } else {
         setMessage(
@@ -507,6 +512,15 @@ void Game::setMessage(const std::string &newMessage) {
     message = newMessage;
 }
 
+// Adds a same-turn event without hiding earlier messages.
+void Game::appendMessage(const std::string &newMessage) {
+    if (message.empty()) {
+        message = newMessage;
+    } else {
+        message += " " + newMessage;
+    }
+}
+
 // Selects the current 25-row layout chunk from a 25-row or 125-row layout file.
 std::vector<std::string> Game::currentLayoutRows() const {
     if (!layoutRows) {
@@ -571,7 +585,7 @@ void Game::collectItemIfPresent() {
         return;
     }
     if (currentLevel.isGuardedItemLocked(item->getPosition())) {
-        setMessage("The item is still guarded by a Vault Anchor.");
+        appendMessage("The item is still guarded by a Vault Anchor.");
         return;
     }
 
@@ -588,7 +602,7 @@ void Game::collectItemIfPresent() {
     std::string itemName = item->getName();
     arcanist->addRuneFragments(value);
     currentLevel.removeItemAt(arcanist->getPosition());
-    setMessage("Collected " + itemName + " worth " + std::to_string(value) + ".");
+    appendMessage("Collected " + itemName + " worth " + std::to_string(value) + ".");
 }
 
 // Applies major item pickup effects.
@@ -598,10 +612,10 @@ void Game::collectMajorItem(Item &item) {
     if (type == MajorItemType::CipherGem) {
         arcanist->collectCipherGem();
         currentLevel.revealStairway();
-        setMessage("Collected the Cipher Gem. The stairway is revealed.");
+        appendMessage("Collected the Cipher Gem. The stairway is revealed.");
     } else if (type == MajorItemType::AegisCloak) {
         arcanist->collectAegisCloak();
-        setMessage("Collected the Aegis Cloak.");
+        appendMessage("Collected the Aegis Cloak.");
     }
 }
 
@@ -656,7 +670,7 @@ void Game::resolveSpectreAttack(const AbstractSpectre &spectre) {
     }
 
     if (rng.chance(1, 2)) {
-        setMessage(spectre.getName() + " missed.");
+        appendMessage(spectre.getName() + " missed.");
         return;
     }
 
@@ -666,7 +680,7 @@ void Game::resolveSpectreAttack(const AbstractSpectre &spectre) {
         damage = std::max(1, (damage + 1) / 2);
     }
     arcanist->changeFP(-damage);
-    setMessage(spectre.getName() + " hit for " + std::to_string(damage) + " damage.");
+    appendMessage(spectre.getName() + " hit for " + std::to_string(damage) + " damage.");
 
     if (arcanist->getCurrentFP() == 0) {
         setState(StateKind::Lost);
@@ -782,7 +796,7 @@ void Game::advanceToNextLevel() {
     if (arcanist->getCurrentFP() == 0) {
         return;
     }
-    setMessage("Descended to vault level " + std::to_string(nextLevelNumber) + ".");
+    appendMessage("Descended to vault level " + std::to_string(nextLevelNumber) + ".");
 }
 
 // Switches to Lost state whenever FP has reached 0.
