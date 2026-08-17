@@ -142,7 +142,7 @@ class VaultAnchor: public AbstractSpectre {
 class SpecterLord: public AbstractSpectre {
   public:
     // Creates a Specter Lord with the spec's starting stats.
-    SpecterLord(const Position &position, int spawnChamberId);
+    SpecterLord(const Position &position, int spawnChamberId, bool enableChase = true);
 };
 
 #endif

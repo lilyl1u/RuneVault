@@ -22,7 +22,7 @@ class SpectreFactory {
         Random &rng,
         const Position &position,
         int spawnChamberId,
-        bool enableSpecterLord = false) const;
+        bool enableSpecterLordChase = false) const;
 };
 
 #endif

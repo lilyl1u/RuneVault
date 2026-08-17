@@ -38,7 +38,7 @@ class Game {
     std::optional<std::vector<std::string>> layoutRows;
     int aegisCloakLevel;
     bool quitRequested;
-    bool enableSpecterLord;
+    bool enableSpecterLordChase;
     std::array<bool, 6> unlockedScrolls;
 
     // Builds the current one-line status summary for TextDisplay.
@@ -88,16 +88,16 @@ class Game {
     Game();
 
     // Creates a game with deterministic RNG, useful for tests.
-    Game(unsigned int seed, bool enableSpecterLord = false);
+    Game(unsigned int seed, bool enableSpecterLordChase = false);
 
     // Creates a layout-file game with a time-seeded RNG.
     explicit Game(const std::vector<std::string> &layoutRows);
 
     // Creates a layout-file game with deterministic RNG.
-    Game(const std::vector<std::string> &layoutRows, unsigned int seed, bool enableSpecterLord = false);
+    Game(const std::vector<std::string> &layoutRows, unsigned int seed, bool enableSpecterLordChase = false);
 
-    // Enables or disables the optional Specter Lord bonus enemy.
-    void setSpecterLordEnabled(bool enabled);
+    // Enables or disables the optional Specter Lord chase movement.
+    void setSpecterLordChaseEnabled(bool enabled);
 
     // Renders the current model state through TextDisplay.
     void draw(std::ostream &out) const;

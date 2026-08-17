@@ -101,13 +101,13 @@ Game::Game():
     layoutRows{std::nullopt},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{false},
+    enableSpecterLordChase{false},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
 
 // Constructs a new game using a fixed seed for repeatable tests.
-Game::Game(unsigned int seed, bool enableSpecterLord):
+Game::Game(unsigned int seed, bool enableSpecterLordChase):
     currentLevel{1},
     display{},
     rng{seed},
@@ -118,7 +118,7 @@ Game::Game(unsigned int seed, bool enableSpecterLord):
     layoutRows{std::nullopt},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{enableSpecterLord},
+    enableSpecterLordChase{enableSpecterLordChase},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
@@ -135,7 +135,7 @@ Game::Game(const std::vector<std::string> &layoutRows):
     layoutRows{layoutRows},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{false},
+    enableSpecterLordChase{false},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
@@ -144,7 +144,7 @@ Game::Game(const std::vector<std::string> &layoutRows):
 Game::Game(
     const std::vector<std::string> &layoutRows,
     unsigned int seed,
-    bool enableSpecterLord):
+    bool enableSpecterLordChase):
     currentLevel{1, Map::createFromLayoutRows(layoutRowsForLevel(layoutRows, 1))},
     display{},
     rng{seed},
@@ -155,14 +155,14 @@ Game::Game(
     layoutRows{layoutRows},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{enableSpecterLord},
+    enableSpecterLordChase{enableSpecterLordChase},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
 
-// Toggles whether random generation may create the bonus Specter Lord enemy.
-void Game::setSpecterLordEnabled(bool enabled) {
-    enableSpecterLord = enabled;
+// Toggles whether random Specter Lords use the bonus chase movement.
+void Game::setSpecterLordChaseEnabled(bool enabled) {
+    enableSpecterLordChase = enabled;
 }
 
 // Draws the model by passing terrain, item symbols, Arcanist position, and status to the View.
@@ -742,7 +742,7 @@ void Game::startCurrentLevel() {
             arcanist->getPosition(),
             currentLevel.getLevelNumber() == aegisCloakLevel);
     }
-    currentLevel.generateSpectres(rng, arcanist->getPosition(), enableSpecterLord);
+    currentLevel.generateSpectres(rng, arcanist->getPosition(), enableSpecterLordChase);
 
     // EXTENSION: Ritualist
     // Ritualists begin every level with one random scroll effect already active.

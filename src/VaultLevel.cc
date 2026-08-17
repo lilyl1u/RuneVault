@@ -159,7 +159,7 @@ void VaultLevel::generateBasicItems(
 void VaultLevel::generateSpectres(
     Random &rng,
     const Position &arcanistPosition,
-    bool enableSpecterLord) {
+    bool enableSpecterLordChase) {
     SpectreFactory factory;
     std::vector<Position> blocked{arcanistPosition, hiddenStairway};
 
@@ -174,7 +174,7 @@ void VaultLevel::generateSpectres(
         Position pos = randomFreeSpectreSpawnTile(rng, blocked);
         blocked.emplace_back(pos);
         int chamberId = map.getCell(pos).getChamberId();
-        addSpectre(factory.createRandomNonAnchor(rng, pos, chamberId, enableSpecterLord));
+        addSpectre(factory.createRandomNonAnchor(rng, pos, chamberId, enableSpecterLordChase));
     }
 
     assignCipherGemCarrier(rng);

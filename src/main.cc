@@ -65,12 +65,12 @@ int main(int argc, char *argv[]) {
     // main wires together the Model owner (Game) and Controller.
     // TextDisplay is owned by Game for now, so main does not perform rendering itself.
     try {
-        bool enableSpecterLord = false;
+        bool enableSpecterLordChase = false;
         std::vector<std::string> args;
         for (int i = 1; i < argc; ++i) {
             std::string arg{argv[i]};
             if (arg == "-specterlord") {
-                enableSpecterLord = true;
+                enableSpecterLordChase = true;
             } else {
                 args.emplace_back(arg);
             }
@@ -86,15 +86,15 @@ int main(int argc, char *argv[]) {
         if (args.empty()) {
             game = std::make_unique<Game>();
         } else if (args.size() == 1 && looksLikeSeed(args[0])) {
-            game = std::make_unique<Game>(parseSeedArgument(args[0]), enableSpecterLord);
+            game = std::make_unique<Game>(parseSeedArgument(args[0]), enableSpecterLordChase);
         } else if (args.size() == 1) {
             game = std::make_unique<Game>(readLayoutRows(args[0]));
         } else {
             std::vector<std::string> rows = readLayoutRows(args[0]);
-            game = std::make_unique<Game>(rows, parseSeedArgument(args[1]), enableSpecterLord);
+            game = std::make_unique<Game>(rows, parseSeedArgument(args[1]), enableSpecterLordChase);
         }
 
-        game->setSpecterLordEnabled(enableSpecterLord);
+        game->setSpecterLordChaseEnabled(enableSpecterLordChase);
 
         Controller controller{*game};
         controller.run(std::cin, std::cout);

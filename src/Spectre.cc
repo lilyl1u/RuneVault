@@ -2,6 +2,17 @@
 
 #include <algorithm>
 
+namespace {
+
+std::unique_ptr<MovementStrategy> makeSpecterLordMovement(bool enableChase) {
+    if (enableChase) {
+        return std::make_unique<ChaseMovement>();
+    }
+    return std::make_unique<RandomMovement>();
+}
+
+} // namespace
+
 // Stores shared spectre data from the specification.
 AbstractSpectre::AbstractSpectre(
     SpectreType type,
@@ -202,7 +213,7 @@ VaultAnchor::VaultAnchor(const Position &position, int spawnChamberId):
         std::make_unique<GuardedItemHostility>()} {}
 
 // Creates a Specter Lord.
-SpecterLord::SpecterLord(const Position &position, int spawnChamberId):
+SpecterLord::SpecterLord(const Position &position, int spawnChamberId, bool enableChase):
     AbstractSpectre{
         SpectreType::SpecterLord,
         "Specter Lord",
@@ -212,5 +223,5 @@ SpecterLord::SpecterLord(const Position &position, int spawnChamberId):
         15,
         position,
         spawnChamberId,
-        std::make_unique<ChaseMovement>(),
+        makeSpecterLordMovement(enableChase),
         std::make_unique<AlwaysHostile>()} {}
