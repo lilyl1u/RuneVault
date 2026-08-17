@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <array>
 #include <iosfwd>
 #include <memory>
 #include <optional>
@@ -38,6 +39,7 @@ class Game {
     int aegisCloakLevel;
     bool quitRequested;
     bool enableSpecterLord;
+    std::array<bool, 6> unlockedScrolls;
 
     // Builds the current one-line status summary for TextDisplay.
     std::string makeStatusLine() const;

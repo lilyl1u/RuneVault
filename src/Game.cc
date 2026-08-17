@@ -39,6 +39,56 @@ std::vector<std::string> layoutRowsForLevel(
 
 } // namespace
 
+std::size_t scrollIndex(ScrollType type) {
+    return static_cast<std::size_t>(type);
+}
+
+std::string scrollEffectText(ScrollType type) {
+    switch (type) {
+        case ScrollType::AttuneFocus:
+            return "Attune Focus (+10 FP)";
+        case ScrollType::SurgePower:
+            return "Surge Power (+5 Power)";
+        case ScrollType::FortifyWard:
+            return "Fortify Ward (+5 Ward)";
+        case ScrollType::DrainFocus:
+            return "Drain Focus (-10 FP)";
+        case ScrollType::SapPower:
+            return "Sap Power (-5 Power)";
+        case ScrollType::ErodeWard:
+            return "Erode Ward (-5 Ward)";
+    }
+
+    return "Unknown Scroll";
+}
+
+std::string unlockedScrollsText(const std::array<bool, 6> &unlockedScrolls) {
+    const std::array<ScrollType, 6> scrollTypes{
+        ScrollType::AttuneFocus,
+        ScrollType::SurgePower,
+        ScrollType::FortifyWard,
+        ScrollType::DrainFocus,
+        ScrollType::SapPower,
+        ScrollType::ErodeWard
+    };
+
+    std::string text;
+    for (ScrollType type: scrollTypes) {
+        if (!unlockedScrolls[scrollIndex(type)]) {
+            continue;
+        }
+        if (!text.empty()) {
+            text += ", ";
+        }
+        text += scrollEffectText(type);
+    }
+
+    if (text.empty()) {
+        return "None";
+    }
+    return text;
+}
+
 // Constructs a new game using a time-seeded RNG.
 Game::Game():
     currentLevel{1},
@@ -51,7 +101,8 @@ Game::Game():
     layoutRows{std::nullopt},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{false} {
+    enableSpecterLord{false},
+    unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
 
@@ -67,7 +118,8 @@ Game::Game(unsigned int seed, bool enableSpecterLord):
     layoutRows{std::nullopt},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{enableSpecterLord} {
+    enableSpecterLord{enableSpecterLord},
+    unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
 
@@ -83,7 +135,8 @@ Game::Game(const std::vector<std::string> &layoutRows):
     layoutRows{layoutRows},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{false} {
+    enableSpecterLord{false},
+    unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
 
@@ -102,7 +155,8 @@ Game::Game(
     layoutRows{layoutRows},
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
-    enableSpecterLord{enableSpecterLord} {
+    enableSpecterLord{enableSpecterLord},
+    unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
 
@@ -219,6 +273,7 @@ bool Game::useScroll(Direction direction) {
 
     ScrollType type = item->getScrollType();
     std::string scrollName = item->getName();
+    unlockedScrolls[scrollIndex(type)] = true;
     applyScroll(type);
     currentLevel.removeItemAt(scrollPosition);
     setMessage("Used scroll: " + scrollName + ".");
@@ -306,6 +361,7 @@ void Game::restart() {
     arcanist.reset();
     aegisCloakLevel = rng.range(2, 4);
     quitRequested = false;
+    unlockedScrolls.fill(false);
     setState(StateKind::ClassSelection);
 }
 
@@ -471,7 +527,8 @@ std::string Game::makeStatusLine() const {
            "  FP: " + std::to_string(arcanist->getCurrentFP()) +
            "  Pwr: " + std::to_string(arcanist->getPower()) +
            "  WR: " + std::to_string(arcanist->getWard()) +
-           "  Fragments: " + std::to_string(arcanist->getRuneFragments());
+           "  Fragments: " + std::to_string(arcanist->getRuneFragments()) +
+           "  Unlocked Scrolls: " + unlockedScrollsText(unlockedScrolls);
 }
 
 // Chooses a random floor tile from any chamber for the Arcanist spawn.
