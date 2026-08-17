@@ -755,6 +755,7 @@ void Game::startCurrentLevel() {
     // level-start hook works without checking whether the concrete class is Ritualist.
     if (arcanist->startsLevelWithRandomScrollEffect()) {
         ScrollType randomScrollType = static_cast<ScrollType>(rng.range(0, 5));
+        unlockedScrolls[scrollIndex(randomScrollType)] = true;
         applyScroll(randomScrollType);
         appendMessage("Ritualist started this level with " + scrollEffectText(randomScrollType) + ".");
         updateLossIfArcanistDefeated();
