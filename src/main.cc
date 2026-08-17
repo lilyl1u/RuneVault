@@ -65,23 +65,36 @@ int main(int argc, char *argv[]) {
     // main wires together the Model owner (Game) and Controller.
     // TextDisplay is owned by Game for now, so main does not perform rendering itself.
     try {
-        if (argc > 3) {
+        bool enableSpecterLord = false;
+        std::vector<std::string> args;
+        for (int i = 1; i < argc; ++i) {
+            std::string arg{argv[i]};
+            if (arg == "-specterlord") {
+                enableSpecterLord = true;
+            } else {
+                args.emplace_back(arg);
+            }
+        }
+
+        if (args.size() > 2) {
             throw std::invalid_argument{
-                "Usage: ./runevault [seed] or ./runevault [layout-file] [seed]"};
+                "Usage: ./runevault [-specterlord] [seed] or ./runevault [-specterlord] [layout-file] [seed]"};
         }
 
         std::unique_ptr<Game> game;
 
-        if (argc == 1) {
+        if (args.empty()) {
             game = std::make_unique<Game>();
-        } else if (argc == 2 && looksLikeSeed(argv[1])) {
-            game = std::make_unique<Game>(parseSeedArgument(argv[1]));
-        } else if (argc == 2) {
-            game = std::make_unique<Game>(readLayoutRows(argv[1]));
+        } else if (args.size() == 1 && looksLikeSeed(args[0])) {
+            game = std::make_unique<Game>(parseSeedArgument(args[0]), enableSpecterLord);
+        } else if (args.size() == 1) {
+            game = std::make_unique<Game>(readLayoutRows(args[0]));
         } else {
-            std::vector<std::string> rows = readLayoutRows(argv[1]);
-            game = std::make_unique<Game>(rows, parseSeedArgument(argv[2]));
+            std::vector<std::string> rows = readLayoutRows(args[0]);
+            game = std::make_unique<Game>(rows, parseSeedArgument(args[1]), enableSpecterLord);
         }
+
+        game->setSpecterLordEnabled(enableSpecterLord);
 
         Controller controller{*game};
         controller.run(std::cin, std::cout);

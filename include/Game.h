@@ -37,6 +37,7 @@ class Game {
     std::optional<std::vector<std::string>> layoutRows;
     int aegisCloakLevel;
     bool quitRequested;
+    bool enableSpecterLord;
 
     // Builds the current one-line status summary for TextDisplay.
     std::string makeStatusLine() const;
@@ -85,13 +86,16 @@ class Game {
     Game();
 
     // Creates a game with deterministic RNG, useful for tests.
-    explicit Game(unsigned int seed);
+    Game(unsigned int seed, bool enableSpecterLord = false);
 
     // Creates a layout-file game with a time-seeded RNG.
     explicit Game(const std::vector<std::string> &layoutRows);
 
     // Creates a layout-file game with deterministic RNG.
-    Game(const std::vector<std::string> &layoutRows, unsigned int seed);
+    Game(const std::vector<std::string> &layoutRows, unsigned int seed, bool enableSpecterLord = false);
+
+    // Enables or disables the optional Specter Lord bonus enemy.
+    void setSpecterLordEnabled(bool enabled);
 
     // Renders the current model state through TextDisplay.
     void draw(std::ostream &out) const;

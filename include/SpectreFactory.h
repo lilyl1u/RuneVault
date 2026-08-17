@@ -21,7 +21,8 @@ class SpectreFactory {
     std::unique_ptr<AbstractSpectre> createRandomNonAnchor(
         Random &rng,
         const Position &position,
-        int spawnChamberId) const;
+        int spawnChamberId,
+        bool enableSpecterLord = false) const;
 };
 
 #endif

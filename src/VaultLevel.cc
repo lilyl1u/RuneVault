@@ -156,7 +156,10 @@ void VaultLevel::generateBasicItems(
 }
 
 // Spawns 20 non-anchor spectres while avoiding the Arcanist, stairway, items, and other spectres.
-void VaultLevel::generateSpectres(Random &rng, const Position &arcanistPosition) {
+void VaultLevel::generateSpectres(
+    Random &rng,
+    const Position &arcanistPosition,
+    bool enableSpecterLord) {
     SpectreFactory factory;
     std::vector<Position> blocked{arcanistPosition, hiddenStairway};
 
@@ -171,7 +174,7 @@ void VaultLevel::generateSpectres(Random &rng, const Position &arcanistPosition)
         Position pos = randomFreeSpectreSpawnTile(rng, blocked);
         blocked.emplace_back(pos);
         int chamberId = map.getCell(pos).getChamberId();
-        addSpectre(factory.createRandomNonAnchor(rng, pos, chamberId));
+        addSpectre(factory.createRandomNonAnchor(rng, pos, chamberId, enableSpecterLord));
     }
 
     assignCipherGemCarrier(rng);

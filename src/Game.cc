@@ -15,9 +15,11 @@ namespace {
 std::vector<std::string> layoutRowsForLevel(
     const std::vector<std::string> &rows,
     int levelNumber) {
+    // layout describes 1 reusable level & returns all rows unchanged
     if (rows.size() == static_cast<std::size_t>(Map::Height)) {
         return rows;
     }
+    // 5- level layout , contains 125 rows, 25 rows per level
     if (rows.size() != static_cast<std::size_t>(Map::Height * 5)) {
         throw std::invalid_argument{
             "Layout file must contain either 25 rows or 125 rows"};
@@ -48,12 +50,13 @@ Game::Game():
     message{},
     layoutRows{std::nullopt},
     aegisCloakLevel{rng.range(2, 4)},
-    quitRequested{false} {
+    quitRequested{false},
+    enableSpecterLord{false} {
     setState(StateKind::ClassSelection);
 }
 
 // Constructs a new game using a fixed seed for repeatable tests.
-Game::Game(unsigned int seed):
+Game::Game(unsigned int seed, bool enableSpecterLord):
     currentLevel{1},
     display{},
     rng{seed},
@@ -63,7 +66,8 @@ Game::Game(unsigned int seed):
     message{},
     layoutRows{std::nullopt},
     aegisCloakLevel{rng.range(2, 4)},
-    quitRequested{false} {
+    quitRequested{false},
+    enableSpecterLord{enableSpecterLord} {
     setState(StateKind::ClassSelection);
 }
 
@@ -78,12 +82,16 @@ Game::Game(const std::vector<std::string> &layoutRows):
     message{},
     layoutRows{layoutRows},
     aegisCloakLevel{rng.range(2, 4)},
-    quitRequested{false} {
+    quitRequested{false},
+    enableSpecterLord{false} {
     setState(StateKind::ClassSelection);
 }
 
 // Constructs a layout-file game using a deterministic RNG.
-Game::Game(const std::vector<std::string> &layoutRows, unsigned int seed):
+Game::Game(
+    const std::vector<std::string> &layoutRows,
+    unsigned int seed,
+    bool enableSpecterLord):
     currentLevel{1, Map::createFromLayoutRows(layoutRowsForLevel(layoutRows, 1))},
     display{},
     rng{seed},
@@ -93,8 +101,14 @@ Game::Game(const std::vector<std::string> &layoutRows, unsigned int seed):
     message{},
     layoutRows{layoutRows},
     aegisCloakLevel{rng.range(2, 4)},
-    quitRequested{false} {
+    quitRequested{false},
+    enableSpecterLord{enableSpecterLord} {
     setState(StateKind::ClassSelection);
+}
+
+// Toggles whether random generation may create the bonus Specter Lord enemy.
+void Game::setSpecterLordEnabled(bool enabled) {
+    enableSpecterLord = enabled;
 }
 
 // Draws the model by passing terrain, item symbols, Arcanist position, and status to the View.
@@ -654,7 +668,7 @@ void Game::startCurrentLevel() {
             arcanist->getPosition(),
             currentLevel.getLevelNumber() == aegisCloakLevel);
     }
-    currentLevel.generateSpectres(rng, arcanist->getPosition());
+    currentLevel.generateSpectres(rng, arcanist->getPosition(), enableSpecterLord);
 
     // EXTENSION: Ritualist
     // Ritualists begin every level with one random scroll effect already active.

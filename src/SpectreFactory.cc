@@ -38,7 +38,8 @@ std::unique_ptr<AbstractSpectre> SpectreFactory::create(
 std::unique_ptr<AbstractSpectre> SpectreFactory::createRandomNonAnchor(
     Random &rng,
     const Position &position,
-    int spawnChamberId) const {
+    int spawnChamberId,
+    bool enableSpecterLord) const {
     int roll = rng.range(1, 18);
 
     if (roll <= 4) {
@@ -53,7 +54,7 @@ std::unique_ptr<AbstractSpectre> SpectreFactory::createRandomNonAnchor(
     if (roll <= 14) {
         return create(SpectreType::Revenant, position, spawnChamberId);
     }
-    if (roll <= 16) {
+    if (enableSpecterLord && roll <= 16) {
         return create(SpectreType::SpecterLord, position, spawnChamberId);
     }
 
