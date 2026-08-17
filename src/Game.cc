@@ -273,10 +273,15 @@ bool Game::useScroll(Direction direction) {
 
     ScrollType type = item->getScrollType();
     std::string scrollName = item->getName();
+    bool alreadyFound = unlockedScrolls[scrollIndex(type)];
     unlockedScrolls[scrollIndex(type)] = true;
     applyScroll(type);
     currentLevel.removeItemAt(scrollPosition);
-    setMessage("Used scroll: " + scrollName + ".");
+    if (alreadyFound) {
+        setMessage("Used scroll: " + scrollName + ". This scroll type was already found.");
+    } else {
+        setMessage("Used scroll: " + scrollName + ". New scroll type discovered.");
+    }
     if (updateLossIfArcanistDefeated()) {
         return true;
     }
