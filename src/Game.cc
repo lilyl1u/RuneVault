@@ -318,12 +318,12 @@ bool Game::attackSpectre(Direction direction) {
     int remainingFP = spectre->getFocusPoints();
 
     if (spectre->isDefeated()) {
-        bool collectedCipherGem = handleSpectreDefeat(targetPosition, *spectre);
-        if (collectedCipherGem) {
+        bool droppedCipherGem = handleSpectreDefeat(targetPosition, *spectre);
+        if (droppedCipherGem) {
             setMessage(
                 "Hit " + spectreName + " for " + std::to_string(damage) +
                 " damage. " + spectreName + " FP: 0. Defeated " +
-                spectreName + " and recovered the Cipher Gem. The stairway is revealed.");
+                spectreName + ". The Cipher Gem dropped.");
         } else {
             setMessage(
                 "Hit " + spectreName + " for " + std::to_string(damage) +
@@ -647,11 +647,8 @@ bool Game::handleSpectreDefeat(const Position &position, const AbstractSpectre &
     currentLevel.removeSpectreAt(position);
 
     if (hadCipherGem) {
-        // CIPHER GEM AUTO-PICKUP:
-        // Defeating the carrier gives the gem directly to the Arcanist instead
-        // of dropping a C item that the player must step away from and re-enter.
-        arcanist->collectCipherGem();
-        currentLevel.revealStairway();
+        ItemFactory factory;
+        currentLevel.addItem(factory.createMajorItem(MajorItemType::CipherGem, position));
         return true;
     } else if (type == SpectreType::Lich) {
         ItemFactory factory;
