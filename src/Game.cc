@@ -223,8 +223,8 @@ void Game::selectClass(char classCode) {
     // Game asks the factory for an AbstractArcanist. After this point Game uses
     // the abstract interface, not Sage/Hexblade/Warden/Voidwalker directly.
     arcanist = arcanistFactory.create(classCode, randomSpawnPosition());
-    startCurrentLevel();
     setState(StateKind::Playing);
+    startCurrentLevel();
 }
 
 // Attempts one-square Arcanist movement and collects fragments on the destination tile.
@@ -545,7 +545,7 @@ std::string Game::makeStatusLine() const {
            "  Pwr: " + std::to_string(arcanist->getPower()) +
            "  WR: " + std::to_string(arcanist->getWard()) +
            "  Fragments: " + std::to_string(arcanist->getRuneFragments()) +
-           "  Unlocked Scrolls: " + unlockedScrollsText(unlockedScrolls);
+           "\nUnlocked Scrolls: " + unlockedScrollsText(unlockedScrolls);
 }
 
 // Chooses a random floor tile from any chamber for the Arcanist spawn.
@@ -751,6 +751,7 @@ void Game::startCurrentLevel() {
     if (arcanist->startsLevelWithRandomScrollEffect()) {
         ScrollType randomScrollType = static_cast<ScrollType>(rng.range(0, 5));
         applyScroll(randomScrollType);
+        appendMessage("Ritualist started this level with " + scrollEffectText(randomScrollType) + ".");
         updateLossIfArcanistDefeated();
     }
 }
