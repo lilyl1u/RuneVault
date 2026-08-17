@@ -310,6 +310,7 @@ bool Game::attackSpectre(Direction direction) {
 
     int damage = calculateDamage(arcanist->getPower(), spectre->getWard());
     std::string spectreName = spectre->getName();
+    bool lichesBecameHostile = spectre->getType() == SpectreType::Lich && !lichesProvoked;
     if (spectre->getType() == SpectreType::Lich) {
         lichesProvoked = true;
     }
@@ -332,6 +333,9 @@ bool Game::attackSpectre(Direction direction) {
         setMessage(
             "Hit " + spectreName + " for " + std::to_string(damage) +
             " damage. " + spectreName + " FP: " + std::to_string(remainingFP) + ".");
+    }
+    if (lichesBecameHostile) {
+        appendMessage("Liches are hostile now.");
     }
 
     processSpectreTurns();
