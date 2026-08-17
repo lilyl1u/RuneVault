@@ -17,12 +17,27 @@ class SpectreFactory {
         const Position &position,
         int spawnChamberId) const;
 
+    // Creates a specific spectre, with an optional hostile-Lich override.
+    std::unique_ptr<AbstractSpectre> create(
+        SpectreType type,
+        const Position &position,
+        int spawnChamberId,
+        bool lichesHostile) const;
+
     // Creates one random non-anchor spectre using the required spawn probabilities.
     std::unique_ptr<AbstractSpectre> createRandomNonAnchor(
         Random &rng,
         const Position &position,
         int spawnChamberId,
         bool enableSpecterLordChase = false) const;
+
+    // Creates one random non-anchor spectre, with hostile Liches if provoked.
+    std::unique_ptr<AbstractSpectre> createRandomNonAnchor(
+        Random &rng,
+        const Position &position,
+        int spawnChamberId,
+        bool enableSpecterLordChase,
+        bool lichesHostile) const;
 };
 
 #endif

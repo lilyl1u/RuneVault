@@ -102,6 +102,7 @@ Game::Game():
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
     enableSpecterLordChase{false},
+    lichesProvoked{false},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
@@ -119,6 +120,7 @@ Game::Game(unsigned int seed, bool enableSpecterLordChase):
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
     enableSpecterLordChase{enableSpecterLordChase},
+    lichesProvoked{false},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
@@ -136,6 +138,7 @@ Game::Game(const std::vector<std::string> &layoutRows):
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
     enableSpecterLordChase{false},
+    lichesProvoked{false},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
@@ -156,6 +159,7 @@ Game::Game(
     aegisCloakLevel{rng.range(2, 4)},
     quitRequested{false},
     enableSpecterLordChase{enableSpecterLordChase},
+    lichesProvoked{false},
     unlockedScrolls{} {
     setState(StateKind::ClassSelection);
 }
@@ -306,6 +310,9 @@ bool Game::attackSpectre(Direction direction) {
 
     int damage = calculateDamage(arcanist->getPower(), spectre->getWard());
     std::string spectreName = spectre->getName();
+    if (spectre->getType() == SpectreType::Lich) {
+        lichesProvoked = true;
+    }
     spectre->takeDamage(damage);
     int remainingFP = spectre->getFocusPoints();
 
@@ -374,6 +381,7 @@ void Game::restart() {
     arcanist.reset();
     aegisCloakLevel = rng.range(2, 4);
     quitRequested = false;
+    lichesProvoked = false;
     unlockedScrolls.fill(false);
     setState(StateKind::ClassSelection);
 }
@@ -747,7 +755,11 @@ void Game::startCurrentLevel() {
             arcanist->getPosition(),
             currentLevel.getLevelNumber() == aegisCloakLevel);
     }
-    currentLevel.generateSpectres(rng, arcanist->getPosition(), enableSpecterLordChase);
+    currentLevel.generateSpectres(
+        rng,
+        arcanist->getPosition(),
+        enableSpecterLordChase,
+        lichesProvoked);
 
     // EXTENSION: Ritualist
     // Ritualists begin every level with one random scroll effect already active.

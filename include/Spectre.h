@@ -130,7 +130,7 @@ class Shade: public AbstractSpectre {
 class Lich: public AbstractSpectre {
   public:
     // Creates a Lich with the spec's starting stats.
-    Lich(const Position &position, int spawnChamberId);
+    Lich(const Position &position, int spawnChamberId, bool hostile = false);
 };
 
 class VaultAnchor: public AbstractSpectre {

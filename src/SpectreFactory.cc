@@ -7,6 +7,15 @@ std::unique_ptr<AbstractSpectre> SpectreFactory::create(
     SpectreType type,
     const Position &position,
     int spawnChamberId) const {
+    return create(type, position, spawnChamberId, false);
+}
+
+// Creates a concrete spectre while returning it through the abstract interface.
+std::unique_ptr<AbstractSpectre> SpectreFactory::create(
+    SpectreType type,
+    const Position &position,
+    int spawnChamberId,
+    bool lichesHostile) const {
     if (type == SpectreType::Wraith) {
         return std::make_unique<Wraith>(position, spawnChamberId);
     }
@@ -20,7 +29,7 @@ std::unique_ptr<AbstractSpectre> SpectreFactory::create(
         return std::make_unique<Shade>(position, spawnChamberId);
     }
     if (type == SpectreType::Lich) {
-        return std::make_unique<Lich>(position, spawnChamberId);
+        return std::make_unique<Lich>(position, spawnChamberId, lichesHostile);
     }
     if (type == SpectreType::VaultAnchor) {
         return std::make_unique<VaultAnchor>(position, spawnChamberId);
@@ -40,6 +49,21 @@ std::unique_ptr<AbstractSpectre> SpectreFactory::createRandomNonAnchor(
     const Position &position,
     int spawnChamberId,
     bool enableSpecterLordChase) const {
+    return createRandomNonAnchor(
+        rng,
+        position,
+        spawnChamberId,
+        enableSpecterLordChase,
+        false);
+}
+
+// Chooses a non-anchor spectre according to the spec's 18-part probability table.
+std::unique_ptr<AbstractSpectre> SpectreFactory::createRandomNonAnchor(
+    Random &rng,
+    const Position &position,
+    int spawnChamberId,
+    bool enableSpecterLordChase,
+    bool lichesHostile) const {
     int roll = rng.range(1, 18);
 
     if (roll <= 4) {
@@ -58,5 +82,5 @@ std::unique_ptr<AbstractSpectre> SpectreFactory::createRandomNonAnchor(
         return std::make_unique<SpecterLord>(position, spawnChamberId, enableSpecterLordChase);
     }
 
-    return create(SpectreType::Lich, position, spawnChamberId);
+    return create(SpectreType::Lich, position, spawnChamberId, lichesHostile);
 }

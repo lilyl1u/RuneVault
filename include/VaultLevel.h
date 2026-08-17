@@ -71,7 +71,11 @@ class VaultLevel {
     void generateBasicItems(Random &rng, const Position &arcanistPosition, bool spawnAegisCloak = false);
 
     // Spawns the Step 9 spectres after item generation.
-    void generateSpectres(Random &rng, const Position &arcanistPosition, bool enableSpecterLordChase = false);
+    void generateSpectres(
+        Random &rng,
+        const Position &arcanistPosition,
+        bool enableSpecterLordChase = false,
+        bool lichesHostile = false);
 
     // Loads item positions from digit-coded layout rows.
     void loadItemsFromLayoutRows(

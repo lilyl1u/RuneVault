@@ -11,6 +11,13 @@ std::unique_ptr<MovementStrategy> makeSpecterLordMovement(bool enableChase) {
     return std::make_unique<RandomMovement>();
 }
 
+std::unique_ptr<HostilityStrategy> makeLichHostility(bool hostile) {
+    if (hostile) {
+        return std::make_unique<AlwaysHostile>();
+    }
+    return std::make_unique<NeutralHostility>();
+}
+
 } // namespace
 
 // Stores shared spectre data from the specification.
@@ -185,7 +192,7 @@ Shade::Shade(const Position &position, int spawnChamberId):
         std::make_unique<AlwaysHostile>()} {}
 
 // Creates a Lich.
-Lich::Lich(const Position &position, int spawnChamberId):
+Lich::Lich(const Position &position, int spawnChamberId, bool hostile):
     AbstractSpectre{
         SpectreType::Lich,
         "Lich",
@@ -196,7 +203,7 @@ Lich::Lich(const Position &position, int spawnChamberId):
         position,
         spawnChamberId,
         std::make_unique<RandomMovement>(),
-        std::make_unique<NeutralHostility>()} {}
+        makeLichHostility(hostile)} {}
 
 // Creates a Vault Anchor.
 VaultAnchor::VaultAnchor(const Position &position, int spawnChamberId):

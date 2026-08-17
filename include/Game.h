@@ -39,6 +39,7 @@ class Game {
     int aegisCloakLevel;
     bool quitRequested;
     bool enableSpecterLordChase;
+    bool lichesProvoked;
     std::array<bool, 6> unlockedScrolls;
 
     // Builds the current one-line status summary for TextDisplay.
