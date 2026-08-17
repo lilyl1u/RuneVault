@@ -335,7 +335,7 @@ bool Game::attackSpectre(Direction direction) {
             " damage. " + spectreName + " FP: " + std::to_string(remainingFP) + ".");
     }
     if (lichesBecameHostile) {
-        appendMessage("Liches are hostile now.");
+        appendMessage("Liches are hostile for subsequent levels.");
     }
 
     processSpectreTurns();
