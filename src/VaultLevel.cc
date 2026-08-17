@@ -196,6 +196,7 @@ void VaultLevel::loadItemsFromLayoutRows(
 
     ItemFactory factory;
     std::vector<Position> blocked{arcanistPosition};
+    std::vector<Position> shardCofferPositions;
 
     for (int row = 0; row < Map::Height; ++row) {
         if (static_cast<int>(rows[row].length()) != Map::Width) {
@@ -219,20 +220,28 @@ void VaultLevel::loadItemsFromLayoutRows(
             int digit = rows[row][col] - '0';
             if (digit <= 5) {
                 addItem(factory.createScroll(static_cast<ScrollType>(digit), pos));
+            } else if (digit == 9) {
+                shardCofferPositions.emplace_back(pos);
             } else {
                 FragmentType type = FragmentType::CommonShard;
                 if (digit == 7) {
                     type = FragmentType::ResonantShard;
                 } else if (digit == 8) {
                     type = FragmentType::LichCache;
-                } else if (digit == 9) {
-                    type = FragmentType::ShardCoffer;
                 }
                 addItem(factory.createFragment(type, pos));
             }
 
             blocked.emplace_back(pos);
         }
+    }
+
+    for (const Position &cofferPosition: shardCofferPositions) {
+        Position anchorPosition = randomAdjacentFreeSpawnTile(rng, cofferPosition, blocked);
+        blocked.emplace_back(anchorPosition);
+        addGuardedItem(
+            factory.createFragment(FragmentType::ShardCoffer, cofferPosition),
+            anchorPosition);
     }
 
     hiddenStairway = randomFreeSpawnTile(rng, blocked);
